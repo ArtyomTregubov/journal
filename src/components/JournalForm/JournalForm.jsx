@@ -1,14 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { Button } from '../Button/Button';
 import styles from './JournalForm.module.css';
 import cn from 'classnames';
+import { formReducer, INITIAL_STATE } from './JournalForm.state';
 
 export const JournalForm = ({onSubmit}) => {
-	const [formValideState, setFormValideState] = useState({
-		title: true,
-		date: true,
-		post: true
-	});
+	const [formState, formDispatch] = useReducer(formReducer, INITIAL_STATE);
+	const { isValid } = formState;
+
+	useEffect(() => {
+		let timerId;
+		if(!isValid.title || !isValid.date || !isValid.post) {
+			timerId = setTimeout(() => {
+				formDispatch({type: 'RESET_VALIDITY'});
+			}, 2000);
+		}
+
+		return () => {
+			clearTimeout(timerId);
+		};
+	}, [isValid]);
 
 	const addJournalItem = (e) => {
 		e.preventDefault();
