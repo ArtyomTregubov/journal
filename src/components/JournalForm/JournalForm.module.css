@@ -9,18 +9,6 @@
     background-color: rgb(106, 22, 22);
 }
 
-.input-title {
-    width: 100%;
-    border: none;
-    background: none;
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-    font-family: 'Source Sans 3', sans-serif;
-    border-bottom: 1px solid #272727  ;
-}
-
 .form-row {
     display: flex;
     align-items: center;

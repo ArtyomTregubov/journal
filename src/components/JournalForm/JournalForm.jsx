@@ -1,13 +1,19 @@
-import { useEffect, useReducer } from 'react';
+import { useContext, useEffect, useReducer, useRef } from 'react';
 import { Button } from '../Button/Button';
 import styles from './JournalForm.module.css';
 import cn from 'classnames';
 import { formReducer, INITIAL_STATE } from './JournalForm.state';
+import Input from '../Input/Input';
+import { UserContext } from '../../context/user.context';
 
 export const JournalForm = ({onSubmit}) => {
 	
 	const [formState, formDispatch] = useReducer(formReducer, INITIAL_STATE);
 	const { isValid, isFormRedyToSubmit, values } = formState;
+	const titleRef = useRef();
+	const dateRef = useRef();
+	const postRef = useRef();
+	const {userId} = useContext(UserContext);
 
 	const onChange = (e) => {
 		formDispatch({type: 'SET_VALUE', payload: {[e.target.name]: e.target.value}});
@@ -16,10 +22,12 @@ export const JournalForm = ({onSubmit}) => {
 	useEffect(() => {
 		let timerId;
 		if(!isValid.title || !isValid.date || !isValid.post) {
+			focusError(isValid);
 			timerId = setTimeout(() => {
 				formDispatch({type: 'RESET_VALIDITY'});
 			}, 2000);
 		}
+
 
 		return () => {
 			clearTimeout(timerId);
@@ -31,7 +39,7 @@ export const JournalForm = ({onSubmit}) => {
 			onSubmit(values);
 			formDispatch({type: 'CLEAR'});
 		}
-	}, [isFormRedyToSubmit]);
+	}, [isFormRedyToSubmit, values, onSubmit]);
 
 	const addJournalItem = (e) => {
 		e.preventDefault();
@@ -39,33 +47,66 @@ export const JournalForm = ({onSubmit}) => {
 
 	};
 
+	const focusError = (isValid) => {
+		switch(true) {
+		case !isValid.title:
+			titleRef.current.focus();
+			break;
+		case !isValid.date: 
+			dateRef.current.focus();
+			break;
+		case !isValid.post:
+			postRef.current.focus();
+			break;		
+		}
+	};
+
 	return (
+
 		<form className={styles['journal-form']} onSubmit={addJournalItem}>
+			{userId}
 			<div>
-				<input type='text' name='title' value={values.title} onChange={onChange} className={cn(styles['input-title'], {
-					[styles['invalid']]: !isValid.title
-				})} />
+				<Input 
+					type='text' 
+					name='title' 
+					value={values.title} 
+					ref={titleRef}
+					onChange={onChange} 
+					apperance='title'
+					isValid={isValid.title}
+				/>
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor='date' className={styles['form-lable']}> 
-					<img src='../../../public/calendar.png' alt='иконка календаря' className={styles['lable-icon']} />
+					<img src='/calendar.png' alt='иконка календаря' className={styles['lable-icon']} />
 					<span>Дата</span>
 				</label>
-				<input type='date' name='date' value={values.date} onChange={onChange} id='date' className={cn(styles['input'], {
-					[styles['invalid']]: !isValid.date
-				})} />   
+				<Input 
+					type='date' 
+					name='date' 
+					value={values.date} 
+					ref={dateRef}
+					onChange={onChange} 
+					id='date' 
+					isValid={isValid.date}
+				/>   
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor='tag' className={styles['form-lable']}> 
-					<img src='../../../public/folder.png' alt='иконка папки' className={styles['lable-icon']} />
+					<img src='/folder.png' alt='иконка папки' className={styles['lable-icon']} />
 					<span>Метки</span>
 				</label>
-				<input type='text' name='tag' id='tag' value={values.tag} onChange={onChange} className={cn(styles['input'], {
-					[styles['invalid']]: !isValid.date
-				})} />
+				<Input 
+					type='text'  
+					name='tag' 
+					id='tag' 
+					value={values.tag} 
+					onChange={onChange} 
+				/>
 			</div>
 			<textarea 
 				value={values.post} 
+				ref={postRef}
 				onChange={onChange}
 				name='post' 
 				id='post' 
