@@ -41,6 +41,10 @@ export const JournalForm = ({onSubmit}) => {
 		}
 	}, [isFormRedyToSubmit, values, onSubmit]);
 
+	useEffect(() => {
+		formDispatch({type: 'SET_VALUE', payload: {userId}});
+	}, [userId]);
+
 	const addJournalItem = (e) => {
 		e.preventDefault();
 		formDispatch({type: 'SUBMIT'});
@@ -64,7 +68,6 @@ export const JournalForm = ({onSubmit}) => {
 	return (
 
 		<form className={styles['journal-form']} onSubmit={addJournalItem}>
-			{userId}
 			<div>
 				<Input 
 					type='text' 

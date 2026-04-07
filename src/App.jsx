@@ -25,10 +25,9 @@ function App() {
 
 	const addItem = item => {
 		setItems([...mapItems(items), {
+			...item,
 			id: items.length > 0 ? Math.max(...items.map(i => i.id )) + 1 : 1,
-			title: item.title,
-			date: new Date(item.date),
-			post: item.post
+			date: new Date(item.date)
 		}]);
 	};
 
@@ -36,7 +35,6 @@ function App() {
 		<UserContextProvider>
 			<div className='app'>
 				<LeftPanel>
-					<SelectUser/>
 					<Header/>
 					<JournalAddButton/>
 					<JournalList items={mapItems(items)} />
