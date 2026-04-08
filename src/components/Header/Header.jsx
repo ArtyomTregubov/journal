@@ -8,7 +8,7 @@ const logos = ['/react.svg', '/vite.svg  '];
 export const Header = () => {
 	const [indexLogo, setIndexLogo] = useState(0);
 	const toggleIndex = () => {
-		setIndexLogo(state => Number(!state));
+		setIndexLogo(state => Number(state));
 	};
 
 	return (
