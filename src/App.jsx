@@ -8,6 +8,7 @@ import { JournalList } from './components/JournalList/JournalList';
 import { LeftPanel } from './components/LeftPanel/LeftPanel';
 import { UserContextProvider } from './context/user.context';
 import { useLockalStoradge } from './hooks/use-lockalStoradge.hook';
+import { useState } from 'react';
 
 function mapItems(items) {
 	if (!items) {
@@ -22,13 +23,30 @@ function mapItems(items) {
 function App() {
 	
 	const [items, setItems] = useLockalStoradge('data');
+	const [selectedItem, setSelectedItem] = useState(null);
 
 	const addItem = item => {
-		setItems([...mapItems(items), {
-			...item,
-			id: items.length > 0 ? Math.max(...items.map(i => i.id )) + 1 : 1,
-			date: new Date(item.date)
-		}]);
+		if (!item.id) {
+			setItems([...mapItems(items), {
+				...item,
+				id: items.length > 0 ? Math.max(...items.map(i => i.id )) + 1 : 1,
+				date: new Date(item.date)
+			}]);
+		} else {
+			setItems([...mapItems(items).map(i => {
+				if(i.id === item.id) {
+					return {
+						...item
+					};
+				}
+				return i;
+			})]);
+		}
+		
+	};
+
+	const deleteItem = (id) => {
+		setItems([...items.filter(i => i.id !== id)]);
 	};
 
 	return (
@@ -36,12 +54,16 @@ function App() {
 			<div className='app'>
 				<LeftPanel>
 					<Header/>
-					<JournalAddButton/>
-					<JournalList items={mapItems(items)} />
+					<JournalAddButton clearForm={() => setSelectedItem(null)}/>
+					<JournalList 
+						items={mapItems(items)} 
+						setItem={setSelectedItem}/>
 				</LeftPanel>
 				<Body>
 					<JournalForm
-						onSubmit={addItem} 
+						onSubmit={addItem}
+						data={selectedItem}
+						onDelete={deleteItem}
 					/>
 				</Body>
 			</div>

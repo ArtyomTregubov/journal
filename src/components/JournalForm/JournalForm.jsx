@@ -6,7 +6,7 @@ import { formReducer, INITIAL_STATE } from './JournalForm.state';
 import Input from '../Input/Input';
 import { UserContext } from '../../context/user.context';
 
-export const JournalForm = ({onSubmit}) => {
+export const JournalForm = ({onSubmit, data, onDelete}) => {
 	
 	const [formState, formDispatch] = useReducer(formReducer, INITIAL_STATE);
 	const { isValid, isFormRedyToSubmit, values } = formState;
@@ -14,6 +14,15 @@ export const JournalForm = ({onSubmit}) => {
 	const dateRef = useRef();
 	const postRef = useRef();
 	const {userId} = useContext(UserContext);
+
+	useEffect(() => {
+		if (!data) {
+			formDispatch({type: 'CLEAR'});
+			formDispatch({type: 'SET_VALUE', payload: {userId}});
+		}
+		
+		formDispatch({type: 'SET_VALUE', payload: {...data}});
+	}, [data]);
 
 	const onChange = (e) => {
 		formDispatch({type: 'SET_VALUE', payload: {[e.target.name]: e.target.value}});
@@ -38,8 +47,9 @@ export const JournalForm = ({onSubmit}) => {
 		if(isFormRedyToSubmit) {
 			onSubmit(values);
 			formDispatch({type: 'CLEAR'});
+			formDispatch({type: 'SET_VALUE', payload: {userId}});
 		}
-	}, [isFormRedyToSubmit, values, onSubmit]);
+	}, [isFormRedyToSubmit, values, onSubmit, userId]);
 
 	useEffect(() => {
 		formDispatch({type: 'SET_VALUE', payload: {userId}});
@@ -48,7 +58,12 @@ export const JournalForm = ({onSubmit}) => {
 	const addJournalItem = (e) => {
 		e.preventDefault();
 		formDispatch({type: 'SUBMIT'});
+	};
 
+	const deleteJournalItem = () => {
+		onDelete(data.id);
+		formDispatch({type: 'CLEAR'});
+		formDispatch({type: 'SET_VALUE', payload: {userId}});
 	};
 
 	const focusError = (isValid) => {
@@ -68,7 +83,7 @@ export const JournalForm = ({onSubmit}) => {
 	return (
 
 		<form className={styles['journal-form']} onSubmit={addJournalItem}>
-			<div>
+			<div className={styles['form-row']}>
 				<Input 
 					type='text' 
 					name='title' 
@@ -78,6 +93,7 @@ export const JournalForm = ({onSubmit}) => {
 					apperance='title'
 					isValid={isValid.title}
 				/>
+				{ data?.id && <button className={styles['delete-button']} type='button'onClick={deleteJournalItem}></button>}
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor='date' className={styles['form-lable']}> 
@@ -87,7 +103,7 @@ export const JournalForm = ({onSubmit}) => {
 				<Input 
 					type='date' 
 					name='date' 
-					value={values.date} 
+					value={values.date ? new Date(values.date).toISOString().slice(0, 10) : ''} 
 					ref={dateRef}
 					onChange={onChange} 
 					id='date' 

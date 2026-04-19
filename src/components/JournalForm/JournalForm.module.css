@@ -42,3 +42,18 @@
     border: 1px solid red;
     background-color: rgb(106, 22, 22);
 }
+
+.title-container {
+    display: flex;
+}
+
+.delete-button {
+    border: none;
+    padding: 0;
+    width: 18px;
+    height: 17px;
+    background-image: url(../../../public/delete-icon.png);
+    background-size: cover;
+    background-color: transparent;
+    cursor: pointer;
+}
